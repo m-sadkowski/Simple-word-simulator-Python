@@ -10,7 +10,7 @@ pygame.init()
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 900
 ENTITY_SIZE = 32
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Title and icon
 pygame.display.set_caption("Symulator świata")
@@ -92,7 +92,7 @@ def rysujSwiat(swiat):
 
 
 def display_text(text, x, y, color=(255, 255, 255)):
-    font = pygame.font.SysFont(None, 36)
+    font = pygame.font.SysFont(None, 28)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
     text_rect.center = (x, y)
