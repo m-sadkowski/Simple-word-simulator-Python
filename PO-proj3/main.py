@@ -1,5 +1,4 @@
 import pygame
-from pygame import font
 
 from Punkt import Punkt
 from Swiat import Swiat
@@ -48,6 +47,7 @@ ziemiaImg = pygame.transform.scale(ziemiaImg, (ENTITY_SIZE, ENTITY_SIZE))
 
 base_y = SCREEN_HEIGHT - 5 * ENTITY_SIZE
 
+
 def rysujSwiat(swiat):
     MARGIN = (SCREEN_WIDTH - swiat.getSzerokosc() * ENTITY_SIZE) // 2
     for i, komunikat in enumerate(reversed(swiat.komunikaty)):
@@ -87,15 +87,12 @@ def rysujSwiat(swiat):
             else:
                 screen.blit(ziemiaImg, (x, y))
 
+    przyciskiZapiszWczytaj()
     pygame.display.update()
 
 
-strzalka = -1
-
-font = pygame.font.SysFont(None, 36)
-
-
 def display_text(text, x, y, color=(255, 255, 255)):
+    font = pygame.font.SysFont(None, 36)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
     text_rect.center = (x, y)
@@ -119,6 +116,23 @@ def rysujPrzyciski():
     display_text("Wczytaj gre", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + ENTITY_SIZE)
 
 
+def przyciskiZapiszWczytaj():
+    pygame.draw.rect(screen, (255, 255, 255), (ENTITY_SIZE * 2 - 4,
+                                               SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 - 4,
+                                               ENTITY_SIZE * 8 + 8, ENTITY_SIZE * 2 + 8))
+    pygame.draw.rect(screen, (0, 0, 0), (ENTITY_SIZE * 2,
+                                         SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4,
+                                         ENTITY_SIZE * 8, ENTITY_SIZE * 2))
+    display_text("Zapisz", ENTITY_SIZE * 6, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 3)
+    pygame.draw.rect(screen, (255, 255, 255), (ENTITY_SIZE * 2 - 4,
+                                               SCREEN_HEIGHT / 2 - 4,
+                                               ENTITY_SIZE * 8 + 8, ENTITY_SIZE * 2 + 8))
+    pygame.draw.rect(screen, (0, 0, 0), (ENTITY_SIZE * 2,
+                                         SCREEN_HEIGHT / 2,
+                                         ENTITY_SIZE * 8, ENTITY_SIZE * 2))
+    display_text("Wczytaj", ENTITY_SIZE * 6, SCREEN_HEIGHT / 2 + ENTITY_SIZE)
+
+
 def nowaGra():
     para = wczytajRozmiar()
     swiat = Swiat(para.x, para.y)
@@ -127,9 +141,67 @@ def nowaGra():
 
 
 def wczytajGre():
-    print("Wczytana gra.")
+    swiat = wczytajZapis()
     swiat.generujSwiat()
+    rysujSwiat(swiat)
     return swiat
+
+
+def zapiszSwiat(swiat):
+    input_text = ''
+    zapisywanie = True
+    while zapisywanie:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit(0)
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    zapisywanie = False
+                elif event.key == pygame.K_BACKSPACE:
+                    input_text = input_text[:-1]
+                else:
+                    input_text += event.unicode
+
+        screen.fill((0, 0, 0))
+        display_text("ZAPISYWANIE STANU GRY", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2,
+                     (255, 255, 255))
+        display_text("Podaj nazwe do zapisania (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                     (255, 255, 255))
+        pygame.display.flip()
+
+    swiat.zapiszSwiat(input_text)
+    screen.fill((0, 0, 0))
+    rysujSwiat(swiat)
+
+
+def wczytajZapis():
+    input_text = ''
+    wczytywanie = True
+    while wczytywanie:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit(0)
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    wczytywanie = False
+                elif event.key == pygame.K_BACKSPACE:
+                    input_text = input_text[:-1]
+                else:
+                    input_text += event.unicode
+
+        screen.fill((0, 0, 0))
+        display_text("WCZYTYWANIE STANU GRY", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2,
+                     (255, 255, 255))
+        display_text("Podaj nazwe zapisu (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                     (255, 255, 255))
+        pygame.display.flip()
+
+    from Fabryka import wczytaj_swiat
+    swiat = wczytaj_swiat(input_text)
+    screen.fill((0, 0, 0))
+    rysujSwiat(swiat)
+    return swiat
+
 
 def wczytajRozmiar():
     input_text = ''
@@ -139,7 +211,7 @@ def wczytajRozmiar():
     while liczba1:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                liczba1 = False
+                exit(0)
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     m = int(input_text)
@@ -150,8 +222,9 @@ def wczytajRozmiar():
                 else:
                     input_text += event.unicode
 
-        screen.fill((0,0,0))
-        display_text("Podaj wysokość (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, (255,255,255))
+        screen.fill((0, 0, 0))
+        display_text("Podaj wysokość (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2,
+                     SCREEN_HEIGHT / 2, (255, 255, 255))
         pygame.display.flip()
 
     liczba2 = True
@@ -159,7 +232,7 @@ def wczytajRozmiar():
     while liczba2:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                liczba2 = False
+                exit(0)
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     n = int(input_text)
@@ -170,15 +243,16 @@ def wczytajRozmiar():
                     input_text += event.unicode
 
         screen.fill((0, 0, 0))
-        display_text("Podaj szerokość (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, (255,255,255))
+        display_text("Podaj szerokość (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                     (255, 255, 255))
         pygame.display.flip()
 
     screen.fill((0, 0, 0))
     return Punkt(m, n)
 
 
-
 if __name__ == '__main__':
+    strzalka = -1
 
     welcome = True
     while welcome:
@@ -188,17 +262,16 @@ if __name__ == '__main__':
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                welcome = False
+                exit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2 < event.pos[0] < SCREEN_WIDTH / 2 + ENTITY_SIZE * 4 \
-                        and SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 < event.pos[
-                    1] < SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 + ENTITY_SIZE * 2:
+                if (SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2 < event.pos[0] < SCREEN_WIDTH / 2 + ENTITY_SIZE * 4
+                        and SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 < event.pos[1]
+                        < SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 + ENTITY_SIZE * 2):
                     swiat = nowaGra()
                     rysujSwiat(swiat)
                     welcome = False
                 if SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2 < event.pos[0] < SCREEN_WIDTH / 2 + ENTITY_SIZE * 4 \
                         and SCREEN_HEIGHT / 2 < event.pos[1] < SCREEN_HEIGHT / 2 + ENTITY_SIZE * 2:
-                    wczytajGre()
                     swiat = wczytajGre()
                     welcome = False
 
@@ -212,6 +285,7 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                exit(0)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     strzalka = 0
@@ -225,6 +299,15 @@ if __name__ == '__main__':
                     strzalka = 3
                 if event.key == pygame.K_LCTRL:
                     strzalka = 4
+                if event.key == pygame.K_RCTRL:
+                    zapiszSwiat(swiat)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if ENTITY_SIZE * 2 < event.pos[0] < ENTITY_SIZE * 10 \
+                        and SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 < event.pos[1] < SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2:
+                    zapiszSwiat(swiat)
+                if ENTITY_SIZE * 2 < event.pos[0] < ENTITY_SIZE * 10 \
+                        and SCREEN_HEIGHT / 2 < event.pos[1] < SCREEN_HEIGHT / 2 + ENTITY_SIZE * 2:
+                    swiat = wczytajZapis()
 
         if not strzalka == -1:
             swiat.wykonajTure(strzalka)

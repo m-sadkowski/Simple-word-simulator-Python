@@ -74,3 +74,67 @@ def generujOrganizmySwiat(self, swiat):
 
     para = swiat.generujOrganizm()
     swiat.dodajOrganizm(Czlowiek(para.x, para.y, swiat))
+
+def wczytaj_swiat(nazwa):
+    try:
+        with open(nazwa + ".txt", 'r') as file:
+            m, n = map(int, file.readline().split())
+            ilosc_organizmow = int(file.readline())
+
+            from Swiat import Swiat
+            swiat = Swiat(m, n)
+
+            from Czlowiek import Czlowiek
+            from Antylopa import Antylopa
+            from Wilk import Wilk
+            from Zolw import Zolw
+            from CyberOwca import CyberOwca
+            from Owca import Owca
+            from Lis import Lis
+            from BarszczSosnowskiego import BarszczSosnowskiego
+            from Guarana import Guarana
+            from Mlecz import Mlecz
+            from Trawa import Trawa
+            from WilczeJagody import WilczeJagody
+
+            for _ in range(ilosc_organizmow):
+                line = file.readline().strip().split()
+                symbol = line[0]
+
+                x, y, wiek, sila, inicjatywa, cooldown = map(int, line[1:])
+
+                if symbol == 'A':
+                    swiat.dodajOrganizm(Antylopa(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'b':
+                    swiat.dodajOrganizm(BarszczSosnowskiego(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'C':
+                    swiat.dodajOrganizm(Czlowiek(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'g':
+                    swiat.dodajOrganizm(Guarana(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'L':
+                    swiat.dodajOrganizm(Lis(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'm':
+                    swiat.dodajOrganizm(Mlecz(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'O':
+                    swiat.dodajOrganizm(Owca(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 't':
+                    swiat.dodajOrganizm(Trawa(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'w':
+                    swiat.dodajOrganizm(WilczeJagody(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'W':
+                    swiat.dodajOrganizm(Wilk(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+                elif symbol == 'Z':
+                    swiat.dodajOrganizm(Zolw(x, y, swiat, wiek, sila, inicjatywa, cooldown))
+
+            czas_mocy, moc_uzyta = map(int, file.readline().split())
+
+            for organizm in swiat.organizmy:
+                if isinstance(organizm, Czlowiek):
+                    organizm.setCzasMocy(czas_mocy)
+                    organizm.setMocUzyta(True if moc_uzyta == 1 else False)
+                    break
+
+            return swiat
+
+    except FileNotFoundError as f:
+        print("Nie znaleziono pliku:", f)

@@ -43,10 +43,9 @@ class Zwierze(Organizm):
                 komunikat = ('rozmnozenie ' + organizm.nazwaOrganizmu(self.getSymbol()) + ' na pozycji (' +
                              str(self.getX()) + ', ' + str(self.getY()) + ')')
                 self._swiat.dodajKomunikat(komunikat)
-                self.setCooldown(10)
-                organizm.setCooldown(10)
-                nowy.setCooldown(10)
-
+                self.setCooldown(20)
+                organizm.setCooldown(20)
+                nowy.setCooldown(20)
         elif isinstance(organizm, Roslina):
             komunikat = (organizm.nazwaOrganizmu(self.getSymbol()) + ' zjada ' +
                          organizm.nazwaOrganizmu(organizm.getSymbol()) +

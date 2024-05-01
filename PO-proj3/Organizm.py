@@ -57,6 +57,9 @@ class Organizm:
     def setCooldown(self, cooldown):
         self._sila = cooldown
 
+    def jestesCyberOwca(self):
+        return False
+
     def nazwaOrganizmu(self, symbol):
         switcher = {
             'C': "Czlowiek",

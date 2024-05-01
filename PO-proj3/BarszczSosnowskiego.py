@@ -11,7 +11,7 @@ class BarszczSosnowskiego(Roslina):
         for i in range(4):
             temp = self._swiat.getOrganizm(self._x + X[i], self._y + Y[i])
             if temp is not None:
-                if not isinstance(temp, Roslina):
+                if not isinstance(temp, Roslina) and not temp.jestesCyberOwca():
                     komunikat = ('Barszcz Sosnowskiego zabija ' + self._swiat.getOrganizm(self._x + X[i], self._y + Y[i]).nazwaOrganizmu(
                         self._swiat.getOrganizm(self._x + X[i], self._y + Y[i]).getSymbol()) + ' na pozycji ' + str(self.getX()) + ', ' + str(self.getY()))
                     self._swiat.dodajKomunikat(komunikat)
