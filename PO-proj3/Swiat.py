@@ -16,11 +16,12 @@ class Swiat:
         organizm.setY(y)
 
     def generujOrganizm(self):
-        while True:
+        for _ in range(100):
             X = random.randint(0, self.m - 1)
             Y = random.randint(0, self.n - 1)
             if self.getOrganizm(X, Y) is None:
                 return Punkt(X, Y)
+        return None
 
     def dodajOrganizm(self, organizm):
         self.organizmy.append(organizm)

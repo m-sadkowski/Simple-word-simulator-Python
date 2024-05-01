@@ -63,7 +63,8 @@ def generujOrganizmySwiat(self, swiat):
     def dodajLosoweOrganizmy(rodzaj, liczba):
         for _ in range(liczba):
             punkt = swiat.generujOrganizm()
-            swiat.dodajOrganizm(rodzaj(punkt.x, punkt.y, swiat))
+            if not punkt is None:
+                swiat.dodajOrganizm(rodzaj(punkt.x, punkt.y, swiat))
 
     typy_organizmow = [Owca, Wilk, Zolw, Lis, Antylopa, Trawa, Mlecz, Guarana, WilczeJagody, BarszczSosnowskiego,
                        CyberOwca]
@@ -73,7 +74,8 @@ def generujOrganizmySwiat(self, swiat):
         dodajLosoweOrganizmy(typ, ilosc)
 
     para = swiat.generujOrganizm()
-    swiat.dodajOrganizm(Czlowiek(para.x, para.y, swiat))
+    if not para is None:
+        swiat.dodajOrganizm(Czlowiek(para.x, para.y, swiat))
 
 def wczytaj_swiat(nazwa):
     try:
