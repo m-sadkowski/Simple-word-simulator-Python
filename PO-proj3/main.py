@@ -1,318 +1,187 @@
-import pygame
-
+import tkinter as tk
+from tkinter import simpledialog, messagebox
+from PIL import Image, ImageTk
 from Punkt import Punkt
 from Swiat import Swiat
 
-# PyGame initialization
-pygame.init()
-
-# Screen initialization
+# Constants
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 900
 ENTITY_SIZE = 32
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Title and icon
-pygame.display.set_caption("Symulator świata")
-icon = pygame.image.load('Assets/czlowiek.jpg')
-pygame.display.set_icon(icon)
+class WorldSimulatorApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Symulator świata")
+        self.geometry(f"{SCREEN_WIDTH}x{SCREEN_HEIGHT}")
 
-# Images
-czlowiekImg = pygame.image.load('Assets/czlowiek.jpg')
-czlowiekImg = pygame.transform.scale(czlowiekImg, (ENTITY_SIZE, ENTITY_SIZE))
-antylopaImg = pygame.image.load('Assets/antylopa.jpg')
-antylopaImg = pygame.transform.scale(antylopaImg, (ENTITY_SIZE, ENTITY_SIZE))
-barszczImg = pygame.image.load('Assets/barszcz.jpg')
-barszczImg = pygame.transform.scale(barszczImg, (ENTITY_SIZE, ENTITY_SIZE))
-cyberowcaImg = pygame.image.load('Assets/cyberowca.jpg')
-cyberowcaImg = pygame.transform.scale(cyberowcaImg, (ENTITY_SIZE, ENTITY_SIZE))
-guaranaImg = pygame.image.load('Assets/guarana.jpg')
-guaranaImg = pygame.transform.scale(guaranaImg, (ENTITY_SIZE, ENTITY_SIZE))
-lisImg = pygame.image.load('Assets/lis.jpg')
-lisImg = pygame.transform.scale(lisImg, (ENTITY_SIZE, ENTITY_SIZE))
-mleczImg = pygame.image.load('Assets/mlecz.jpg')
-mleczImg = pygame.transform.scale(mleczImg, (ENTITY_SIZE, ENTITY_SIZE))
-owcaImg = pygame.image.load('Assets/owca.jpg')
-owcaImg = pygame.transform.scale(owcaImg, (ENTITY_SIZE, ENTITY_SIZE))
-trawaImg = pygame.image.load('Assets/trawa.jpg')
-trawaImg = pygame.transform.scale(trawaImg, (ENTITY_SIZE, ENTITY_SIZE))
-jagodyImg = pygame.image.load('Assets/jagody.jpg')
-jagodyImg = pygame.transform.scale(jagodyImg, (ENTITY_SIZE, ENTITY_SIZE))
-wilkImg = pygame.image.load('Assets/wilk.jpg')
-wilkImg = pygame.transform.scale(wilkImg, (ENTITY_SIZE, ENTITY_SIZE))
-zolwImg = pygame.image.load('Assets/zolw.jpg')
-zolwImg = pygame.transform.scale(zolwImg, (ENTITY_SIZE, ENTITY_SIZE))
-ziemiaImg = pygame.image.load('Assets/grass.jpg')
-ziemiaImg = pygame.transform.scale(ziemiaImg, (ENTITY_SIZE, ENTITY_SIZE))
+        self.strzalka = -1
+        self.swiat = None
 
-base_y = SCREEN_HEIGHT - 5 * ENTITY_SIZE
+        # Images
+        self.symbolZdjecia = {
+            'C': self.wczytajObrazy('Assets/czlowiek.jpg'),
+            'A': self.wczytajObrazy('Assets/antylopa.jpg'),
+            'b': self.wczytajObrazy('Assets/barszcz.jpg'),
+            'X': self.wczytajObrazy('Assets/cyberowca.jpg'),
+            'g': self.wczytajObrazy('Assets/guarana.jpg'),
+            'L': self.wczytajObrazy('Assets/lis.jpg'),
+            'm': self.wczytajObrazy('Assets/mlecz.jpg'),
+            'O': self.wczytajObrazy('Assets/owca.jpg'),
+            't': self.wczytajObrazy('Assets/trawa.jpg'),
+            'W': self.wczytajObrazy('Assets/wilk.jpg'),
+            'Z': self.wczytajObrazy('Assets/zolw.jpg'),
+            'w': self.wczytajObrazy('Assets/jagody.jpg')
+        }
+        self.ziemiaImg = self.wczytajObrazy('Assets/grass.jpg')
 
+        # Create a frame for the canvas and scrollbars
+        self.canvas_frame = tk.Frame(self)
+        self.canvas_frame.pack(fill=tk.BOTH, expand=True)
 
-def rysujSwiat(swiat):
-    MARGIN = (SCREEN_WIDTH - swiat.getSzerokosc() * ENTITY_SIZE) // 2
-    for i, komunikat in enumerate(reversed(swiat.komunikaty)):
-        display_y = base_y + i * ENTITY_SIZE
-        display_text(komunikat, SCREEN_WIDTH / 2, display_y, (255, 255, 255))
-        print(komunikat)
-    for i in range(swiat.getWysokosc()):
-        for j in range(swiat.getSzerokosc()):
-            organizm = swiat.getOrganizm(i, j)
-            x = MARGIN + j * ENTITY_SIZE
-            y = ENTITY_SIZE + i * ENTITY_SIZE
-            if organizm:
-                if organizm.getSymbol() == 'C':
-                    screen.blit(czlowiekImg, (x, y))
-                elif organizm.getSymbol() == 'A':
-                    screen.blit(antylopaImg, (x, y))
-                elif organizm.getSymbol() == 'b':
-                    screen.blit(barszczImg, (x, y))
-                elif organizm.getSymbol() == 'X':
-                    screen.blit(cyberowcaImg, (x, y))
-                elif organizm.getSymbol() == 'g':
-                    screen.blit(guaranaImg, (x, y))
-                elif organizm.getSymbol() == 'L':
-                    screen.blit(lisImg, (x, y))
-                elif organizm.getSymbol() == 'm':
-                    screen.blit(mleczImg, (x, y))
-                elif organizm.getSymbol() == 'O':
-                    screen.blit(owcaImg, (x, y))
-                elif organizm.getSymbol() == 't':
-                    screen.blit(trawaImg, (x, y))
-                elif organizm.getSymbol() == 'W':
-                    screen.blit(wilkImg, (x, y))
-                elif organizm.getSymbol() == 'Z':
-                    screen.blit(zolwImg, (x, y))
-                elif organizm.getSymbol() == 'w':
-                    screen.blit(jagodyImg, (x, y))
-            else:
-                screen.blit(ziemiaImg, (x, y))
+        # Create horizontal and vertical scrollbars
+        self.h_scrollbar = tk.Scrollbar(self.canvas_frame, orient=tk.HORIZONTAL)
+        self.h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
 
-    przyciskiZapiszWczytaj()
-    pygame.display.update()
+        self.v_scrollbar = tk.Scrollbar(self.canvas_frame, orient=tk.VERTICAL)
+        self.v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+        # Create the canvas
+        self.canvas = tk.Canvas(self.canvas_frame, width=SCREEN_WIDTH, height=SCREEN_HEIGHT - 200, bg='black', xscrollcommand=self.h_scrollbar.set, yscrollcommand=self.v_scrollbar.set)
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-def display_text(text, x, y, color=(255, 255, 255)):
-    font = pygame.font.SysFont(None, 28)
-    text_surface = font.render(text, True, color)
-    text_rect = text_surface.get_rect()
-    text_rect.center = (x, y)
-    screen.blit(text_surface, text_rect)
+        self.h_scrollbar.config(command=self.canvas.xview)
+        self.v_scrollbar.config(command=self.canvas.yview)
 
+        self.frame_komunikaty = tk.Frame(self, width=SCREEN_WIDTH, height=200)
+        self.frame_komunikaty.pack(side=tk.BOTTOM, fill=tk.X)
+        self.scrollbar = tk.Scrollbar(self.frame_komunikaty)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.text_komunikaty = tk.Text(self.frame_komunikaty, wrap=tk.WORD, yscrollcommand=self.scrollbar.set, state=tk.DISABLED, font=("Bahnschrift", 12))
+        self.text_komunikaty.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.scrollbar.config(command=self.text_komunikaty.yview)
 
-def rysujPrzyciski():
-    pygame.draw.rect(screen, (255, 255, 255), (SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2 - 4,
-                                               SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 - 4,
-                                               ENTITY_SIZE * 8 + 8, ENTITY_SIZE * 2 + 8))
-    pygame.draw.rect(screen, (0, 0, 0), (SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2,
-                                         SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4,
-                                         ENTITY_SIZE * 8, ENTITY_SIZE * 2))
-    display_text("Nowa gra", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 3)
-    pygame.draw.rect(screen, (255, 255, 255), (SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2 - 4,
-                                               SCREEN_HEIGHT / 2 - 4,
-                                               ENTITY_SIZE * 8 + 8, ENTITY_SIZE * 2 + 8))
-    pygame.draw.rect(screen, (0, 0, 0), (SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2,
-                                         SCREEN_HEIGHT / 2,
-                                         ENTITY_SIZE * 8, ENTITY_SIZE * 2))
-    display_text("Wczytaj gre", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + ENTITY_SIZE)
+        self.ekranPowitalny()
 
+        self.bind("<KeyPress>", self.wcisniecieKlawisza)
+        self.bind("<Button-1>", self.klikniecieMyszki)
 
-def przyciskiZapiszWczytaj():
-    pygame.draw.rect(screen, (255, 255, 255), (ENTITY_SIZE * 2 - 4,
-                                               SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 - 4,
-                                               ENTITY_SIZE * 8 + 8, ENTITY_SIZE * 2 + 8))
-    pygame.draw.rect(screen, (0, 0, 0), (ENTITY_SIZE * 2,
-                                         SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4,
-                                         ENTITY_SIZE * 8, ENTITY_SIZE * 2))
-    display_text("Zapisz", ENTITY_SIZE * 6, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 3)
-    pygame.draw.rect(screen, (255, 255, 255), (ENTITY_SIZE * 2 - 4,
-                                               SCREEN_HEIGHT / 2 - 4,
-                                               ENTITY_SIZE * 8 + 8, ENTITY_SIZE * 2 + 8))
-    pygame.draw.rect(screen, (0, 0, 0), (ENTITY_SIZE * 2,
-                                         SCREEN_HEIGHT / 2,
-                                         ENTITY_SIZE * 8, ENTITY_SIZE * 2))
-    display_text("Wczytaj", ENTITY_SIZE * 6, SCREEN_HEIGHT / 2 + ENTITY_SIZE)
+    def wczytajObrazy(self, path):
+        image = Image.open(path)
+        image = image.resize((ENTITY_SIZE, ENTITY_SIZE), Image.Resampling.LANCZOS)
+        return ImageTk.PhotoImage(image)
 
+    def ekranPowitalny(self):
+        self.canvas.delete("all")
+        self.rysujPrzyciski(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4, "Nowa gra", self.nowySwiat)
+        self.rysujPrzyciski(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "Wczytaj gre", self.wczytajSwiat)
 
-def nowaGra():
-    para = wczytajRozmiar()
-    swiat = Swiat(para.x, para.y)
-    swiat.generujSwiat()
-    return swiat
+    def rysujPrzyciski(self, x, y, text, command):
+        button = tk.Button(self, text=text, command=command, bg = 'black', fg = 'white', font=("Bahnschrift", 16))
+        self.canvas.create_window(x, y, window=button)
 
+    def nowySwiat(self):
+        para = self.wczytajRozmiar()
+        self.swiat = Swiat(para.x, para.y)
+        self.swiat.generujSwiat()
+        self.rysujSwiat()
 
-def wczytajGre():
-    swiat = wczytajZapis()
-    swiat.generujSwiat()
-    rysujSwiat(swiat)
-    return swiat
+    def wczytajSwiat(self):
+        self.wczytajZapis()
 
+    def rysujSwiat(self):
+        self.canvas.delete("all")
+        MARGIN = ENTITY_SIZE * 12
 
-def zapiszSwiat(swiat):
-    input_text = ''
-    zapisywanie = True
-    while zapisywanie:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit(0)
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    zapisywanie = False
-                elif event.key == pygame.K_BACKSPACE:
-                    input_text = input_text[:-1]
+        self.text_komunikaty.config(state=tk.NORMAL)
+        self.text_komunikaty.delete('1.0', tk.END)
+        self.text_komunikaty.insert(tk.END, '\n')
+        for komunikat in reversed(self.swiat.komunikaty):
+            self.text_komunikaty.insert(tk.END, '\t' + komunikat + '\n')
+        self.text_komunikaty.config(state=tk.DISABLED)
+        self.text_komunikaty.see(tk.END)
+
+        canvas_width = self.swiat.getSzerokosc() * ENTITY_SIZE + MARGIN * 2
+        canvas_height = self.swiat.getWysokosc() * ENTITY_SIZE + MARGIN
+
+        self.canvas.config(scrollregion=(0, 0, canvas_width, canvas_height))
+
+        for i in range(self.swiat.getWysokosc()):
+            for j in range(self.swiat.getSzerokosc()):
+                organizm = self.swiat.getOrganizm(i, j)
+                x = MARGIN + j * ENTITY_SIZE
+                y = ENTITY_SIZE + i * ENTITY_SIZE
+                if organizm:
+                    image = self.symbolZdjecia.get(organizm.getSymbol())
+                    if image:
+                        self.canvas.create_image(x, y, image=image, anchor='nw')
                 else:
-                    input_text += event.unicode
+                    self.canvas.create_image(x, y, image=self.ziemiaImg, anchor='nw')
 
-        screen.fill((0, 0, 0))
-        display_text("ZAPISYWANIE STANU GRY", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2,
-                     (255, 255, 255))
-        display_text("Podaj nazwe do zapisania (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-                     (255, 255, 255))
-        pygame.display.flip()
+        self.przyciskiZapiszWczytaj()
 
-    swiat.zapiszSwiat(input_text)
-    screen.fill((0, 0, 0))
-    rysujSwiat(swiat)
+    def wyswietlTekst(self, text, x, y, color="white"):
+        self.canvas.create_text(x, y, text=text, fill=color, font=("Helvetica", 16))
 
+    def przyciskiZapiszWczytaj(self):
+        self.rysujPrzyciski(ENTITY_SIZE * 6, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4, "Zapisz",
+                            lambda: self.zapiszSwiat(self.swiat))
+        self.rysujPrzyciski(ENTITY_SIZE * 6, SCREEN_HEIGHT / 2, "Wczytaj", self.wczytajZapis)
 
-def wczytajZapis():
-    input_text = ''
-    wczytywanie = True
-    while wczytywanie:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit(0)
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    wczytywanie = False
-                elif event.key == pygame.K_BACKSPACE:
-                    input_text = input_text[:-1]
-                else:
-                    input_text += event.unicode
+    def zapiszSwiat(self, swiat):
+        input_text = simpledialog.askstring("Zapisz stan gry", "Podaj nazwę do zapisania:")
+        if input_text:
+            swiat.zapiszSwiat(input_text)
+            self.rysujSwiat()
 
-        screen.fill((0, 0, 0))
-        display_text("WCZYTYWANIE STANU GRY", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2,
-                     (255, 255, 255))
-        display_text("Podaj nazwe zapisu (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-                     (255, 255, 255))
-        pygame.display.flip()
+    def wczytajZapis(self):
+        from Fabryka import wczytaj_swiat
+        input_text = simpledialog.askstring("Wczytaj stan gry", "Podaj nazwę zapisu:")
+        if input_text:
+            swiat = wczytaj_swiat(input_text)
+            if swiat:
+                self.swiat = swiat
+                self.rysujSwiat()
 
-    from Fabryka import wczytaj_swiat
-    swiat = wczytaj_swiat(input_text)
-    screen.fill((0, 0, 0))
-    rysujSwiat(swiat)
-    return swiat
+    def wczytajRozmiar(self):
+        rozmiar = simpledialog.askstring("Wymiary świata",
+                                         "Podaj wysokość i szerokość oddzielone przecinkiem (np. 10, 20):")
+        if rozmiar:
+            wysokosc, szerokosc = map(int, rozmiar.split(","))
+            return Punkt(wysokosc, szerokosc)
+        else:
+            return None
 
+    def wcisniecieKlawisza(self, event):
+        if self.swiat:
+            if event.keysym == "Up":
+                self.strzalka = 0
+            elif event.keysym == "Down":
+                self.strzalka = 1
+            elif event.keysym == "Left":
+                self.strzalka = 2
+            elif event.keysym == "Right":
+                self.strzalka = 3
+            elif event.keysym == "Control_L":
+                self.strzalka = 4
+            elif event.keysym == "Control_R":
+                self.zapiszSwiat(self.swiat)
+            elif event.keysym == "Escape":
+                self.destroy()
 
-def wczytajRozmiar():
-    input_text = ''
-    m = 0
-    n = 0
-    liczba1 = True
-    while liczba1:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit(0)
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    m = int(input_text)
-                    input_text = ''
-                    liczba1 = False
-                elif event.key == pygame.K_BACKSPACE:
-                    input_text = input_text[:-1]
-                else:
-                    input_text += event.unicode
+            if self.strzalka != -1:
+                self.swiat.wykonajTure(self.strzalka)
+                self.rysujSwiat()
+                self.strzalka = -1
 
-        screen.fill((0, 0, 0))
-        display_text("Podaj wysokość (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2,
-                     SCREEN_HEIGHT / 2, (255, 255, 255))
-        pygame.display.flip()
-
-    liczba2 = True
-    input_text = ''
-    while liczba2:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit(0)
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    n = int(input_text)
-                    liczba2 = False
-                elif event.key == pygame.K_BACKSPACE:
-                    input_text = input_text[:-1]
-                else:
-                    input_text += event.unicode
-
-        screen.fill((0, 0, 0))
-        display_text("Podaj szerokość (i wciśnij Enter):  " + input_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-                     (255, 255, 255))
-        pygame.display.flip()
-
-    screen.fill((0, 0, 0))
-    return Punkt(m, n)
+    def klikniecieMyszki(self, event):
+        if self.swiat:
+            if ENTITY_SIZE * 2 < event.x < ENTITY_SIZE * 10 and SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 < event.y < SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2:
+                self.zapiszSwiat(self.swiat)
+            elif ENTITY_SIZE * 2 < event.x < ENTITY_SIZE * 10 and SCREEN_HEIGHT / 2 < event.y < SCREEN_HEIGHT / 2 + ENTITY_SIZE * 2:
+                self.swiat = self.wczytajZapis()
 
 
-if __name__ == '__main__':
-    strzalka = -1
-
-    welcome = True
-    while welcome:
-
-        screen.fill((0, 0, 0))
-        rysujPrzyciski()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit(0)
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if (SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2 < event.pos[0] < SCREEN_WIDTH / 2 + ENTITY_SIZE * 4
-                        and SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 < event.pos[1]
-                        < SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 + ENTITY_SIZE * 2):
-                    swiat = nowaGra()
-                    rysujSwiat(swiat)
-                    welcome = False
-                if SCREEN_WIDTH / 2 - ENTITY_SIZE * 8 / 2 < event.pos[0] < SCREEN_WIDTH / 2 + ENTITY_SIZE * 4 \
-                        and SCREEN_HEIGHT / 2 < event.pos[1] < SCREEN_HEIGHT / 2 + ENTITY_SIZE * 2:
-                    swiat = wczytajGre()
-                    welcome = False
-
-        pygame.display.update()
-
-    running = True
-    while running:
-
-        screen.fill((0, 0, 0))
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                exit(0)
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    strzalka = 0
-                if event.key == pygame.K_DOWN:
-                    strzalka = 1
-                if event.key == pygame.K_LEFT:
-                    strzalka = 2
-                if event.key == pygame.K_RIGHT:
-                    strzalka = 3
-                if event.key == pygame.K_RIGHT:
-                    strzalka = 3
-                if event.key == pygame.K_LCTRL:
-                    strzalka = 4
-                if event.key == pygame.K_RCTRL:
-                    zapiszSwiat(swiat)
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if ENTITY_SIZE * 2 < event.pos[0] < ENTITY_SIZE * 10 \
-                        and SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 < event.pos[1] < SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2:
-                    zapiszSwiat(swiat)
-                if ENTITY_SIZE * 2 < event.pos[0] < ENTITY_SIZE * 10 \
-                        and SCREEN_HEIGHT / 2 < event.pos[1] < SCREEN_HEIGHT / 2 + ENTITY_SIZE * 2:
-                    swiat = wczytajZapis()
-
-        if not strzalka == -1:
-            swiat.wykonajTure(strzalka)
-            rysujSwiat(swiat)
-
-        strzalka = -1
-
-pygame.quit()
+if __name__ == "__main__":
+    app = WorldSimulatorApp()
+    app.mainloop()

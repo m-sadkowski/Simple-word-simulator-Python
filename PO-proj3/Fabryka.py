@@ -57,7 +57,7 @@ def generujOrganizmySwiat(self, swiat):
     from Mlecz import Mlecz
     from Trawa import Trawa
     from WilczeJagody import WilczeJagody
-    maxOrganizmow = max((swiat.getWysokosc() + swiat.getWysokosc()) // 11, 1)
+    maxOrganizmow = max((swiat.getWysokosc() + swiat.getSzerokosc()) // 11, 1)
     rand = random.Random()
 
     def dodajLosoweOrganizmy(rodzaj, liczba):
