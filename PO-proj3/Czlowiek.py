@@ -2,8 +2,8 @@ from Zwierze import Zwierze
 
 
 class Czlowiek(Zwierze):
-    stalaSila = 5
-    COOLDOWN = 20
+    __stalaSila = 5
+    __COOLDOWN = 20
 
     def __init__(self, _x, _y, _swiat, _wiek=0, _sila=5, _inicjatywa=4, _cooldown=0):
         super().__init__(_x, _y, _swiat, 'C', _wiek, _sila, _inicjatywa, _cooldown)

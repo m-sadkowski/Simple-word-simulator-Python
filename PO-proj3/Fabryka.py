@@ -8,6 +8,9 @@ def utworzZwierze(symbol, x, y, swiat):
     from CyberOwca import CyberOwca
     from Owca import Owca
     from Lis import Lis
+    from Czlowiek import Czlowiek
+    if symbol == 'C':
+        return Czlowiek(x, y, swiat)
     if symbol == 'W':
         return Wilk(x, y, swiat)
     elif symbol == 'Z':
@@ -77,7 +80,8 @@ def generujOrganizmySwiat(self, swiat):
     if not para is None:
         swiat.dodajOrganizm(Czlowiek(para.x, para.y, swiat))
 
-def wczytaj_swiat(nazwa):
+
+def odczytOrganizmow(nazwa):
     try:
         with open(nazwa + ".txt", 'r') as file:
             m, n = map(int, file.readline().split())
@@ -130,13 +134,13 @@ def wczytaj_swiat(nazwa):
 
             czas_mocy, moc_uzyta = map(int, file.readline().split())
 
-            for organizm in swiat.organizmy:
-                if isinstance(organizm, Czlowiek):
-                    organizm.setCzasMocy(czas_mocy)
-                    organizm.setMocUzyta(True if moc_uzyta == 1 else False)
-                    break
+        for organizm in swiat.organizmy:
+            if isinstance(organizm, Czlowiek):
+                organizm.setCzasMocy(czas_mocy)
+                organizm.setMocUzyta(True if moc_uzyta == 1 else False)
+                break
 
-            return swiat
+        return swiat
 
     except FileNotFoundError as f:
         print("Nie znaleziono pliku:", f)

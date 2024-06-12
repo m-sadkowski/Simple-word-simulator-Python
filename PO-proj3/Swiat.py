@@ -112,3 +112,9 @@ class Swiat:
             if isinstance(organizm, BarszczSosnowskiego):
                 return True
         return False
+
+    def getCzlowiek(self):
+        for organizm in self.organizmy:
+            if organizm.getSymbol() == 'C':
+                return True
+        return False

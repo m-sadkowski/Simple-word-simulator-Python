@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog, messagebox, Toplevel, StringVar, OptionMenu, Button
 from PIL import Image, ImageTk
 from Punkt import Punkt
 from Swiat import Swiat
@@ -8,6 +8,23 @@ from Swiat import Swiat
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 900
 ENTITY_SIZE = 32
+
+
+def wczytajObrazy(path):
+    image = Image.open(path)
+    image = image.resize((ENTITY_SIZE, ENTITY_SIZE), Image.Resampling.LANCZOS)
+    return ImageTk.PhotoImage(image)
+
+
+def wczytajRozmiar():
+    rozmiar = simpledialog.askstring("Wymiary świata", "Podaj wysokość i szerokość "
+                                                       "oddzielone przecinkiem (np. 10, 20):")
+    if rozmiar:
+        wysokosc, szerokosc = map(int, rozmiar.split(","))
+        return Punkt(wysokosc, szerokosc)
+    else:
+        return None
+
 
 class WorldSimulatorApp(tk.Tk):
     def __init__(self):
@@ -20,20 +37,20 @@ class WorldSimulatorApp(tk.Tk):
 
         # Images
         self.symbolZdjecia = {
-            'C': self.wczytajObrazy('Assets/czlowiek.jpg'),
-            'A': self.wczytajObrazy('Assets/antylopa.jpg'),
-            'b': self.wczytajObrazy('Assets/barszcz.jpg'),
-            'X': self.wczytajObrazy('Assets/cyberowca.jpg'),
-            'g': self.wczytajObrazy('Assets/guarana.jpg'),
-            'L': self.wczytajObrazy('Assets/lis.jpg'),
-            'm': self.wczytajObrazy('Assets/mlecz.jpg'),
-            'O': self.wczytajObrazy('Assets/owca.jpg'),
-            't': self.wczytajObrazy('Assets/trawa.jpg'),
-            'W': self.wczytajObrazy('Assets/wilk.jpg'),
-            'Z': self.wczytajObrazy('Assets/zolw.jpg'),
-            'w': self.wczytajObrazy('Assets/jagody.jpg')
+            'C': wczytajObrazy('Assets/czlowiek.jpg'),
+            'A': wczytajObrazy('Assets/antylopa.jpg'),
+            'b': wczytajObrazy('Assets/barszcz.jpg'),
+            'X': wczytajObrazy('Assets/cyberowca.jpg'),
+            'g': wczytajObrazy('Assets/guarana.jpg'),
+            'L': wczytajObrazy('Assets/lis.jpg'),
+            'm': wczytajObrazy('Assets/mlecz.jpg'),
+            'O': wczytajObrazy('Assets/owca.jpg'),
+            't': wczytajObrazy('Assets/trawa.jpg'),
+            'W': wczytajObrazy('Assets/wilk.jpg'),
+            'Z': wczytajObrazy('Assets/zolw.jpg'),
+            'w': wczytajObrazy('Assets/jagody.jpg')
         }
-        self.ziemiaImg = self.wczytajObrazy('Assets/grass.jpg')
+        self.ziemiaImg = wczytajObrazy('Assets/grass.jpg')
 
         # Create a frame for the canvas and scrollbars
         self.canvas_frame = tk.Frame(self)
@@ -47,7 +64,8 @@ class WorldSimulatorApp(tk.Tk):
         self.v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         # Create the canvas
-        self.canvas = tk.Canvas(self.canvas_frame, width=SCREEN_WIDTH, height=SCREEN_HEIGHT - 200, bg='black', xscrollcommand=self.h_scrollbar.set, yscrollcommand=self.v_scrollbar.set)
+        self.canvas = tk.Canvas(self.canvas_frame, width=SCREEN_WIDTH, height=SCREEN_HEIGHT - 200, bg='black',
+                                xscrollcommand=self.h_scrollbar.set, yscrollcommand=self.v_scrollbar.set)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         self.h_scrollbar.config(command=self.canvas.xview)
@@ -57,7 +75,8 @@ class WorldSimulatorApp(tk.Tk):
         self.frame_komunikaty.pack(side=tk.BOTTOM, fill=tk.X)
         self.scrollbar = tk.Scrollbar(self.frame_komunikaty)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.text_komunikaty = tk.Text(self.frame_komunikaty, wrap=tk.WORD, yscrollcommand=self.scrollbar.set, state=tk.DISABLED, font=("Bahnschrift", 12))
+        self.text_komunikaty = tk.Text(self.frame_komunikaty, wrap=tk.WORD, yscrollcommand=self.scrollbar.set,
+                                       state=tk.DISABLED, font=("Bahnschrift", 12))
         self.text_komunikaty.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.scrollbar.config(command=self.text_komunikaty.yview)
 
@@ -66,22 +85,17 @@ class WorldSimulatorApp(tk.Tk):
         self.bind("<KeyPress>", self.wcisniecieKlawisza)
         self.bind("<Button-1>", self.klikniecieMyszki)
 
-    def wczytajObrazy(self, path):
-        image = Image.open(path)
-        image = image.resize((ENTITY_SIZE, ENTITY_SIZE), Image.Resampling.LANCZOS)
-        return ImageTk.PhotoImage(image)
-
     def ekranPowitalny(self):
         self.canvas.delete("all")
         self.rysujPrzyciski(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4, "Nowa gra", self.nowySwiat)
         self.rysujPrzyciski(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "Wczytaj gre", self.wczytajSwiat)
 
     def rysujPrzyciski(self, x, y, text, command):
-        button = tk.Button(self, text=text, command=command, bg = 'black', fg = 'white', font=("Bahnschrift", 16))
+        button = tk.Button(self, text=text, command=command, bg='black', fg='white', font=("Bahnschrift", 16))
         self.canvas.create_window(x, y, window=button)
 
     def nowySwiat(self):
-        para = self.wczytajRozmiar()
+        para = wczytajRozmiar()
         self.swiat = Swiat(para.x, para.y)
         self.swiat.generujSwiat()
         self.rysujSwiat()
@@ -135,22 +149,13 @@ class WorldSimulatorApp(tk.Tk):
             self.rysujSwiat()
 
     def wczytajZapis(self):
-        from Fabryka import wczytaj_swiat
+        from Fabryka import odczytOrganizmow
         input_text = simpledialog.askstring("Wczytaj stan gry", "Podaj nazwę zapisu:")
         if input_text:
-            swiat = wczytaj_swiat(input_text)
+            swiat = odczytOrganizmow(input_text)
             if swiat:
                 self.swiat = swiat
                 self.rysujSwiat()
-
-    def wczytajRozmiar(self):
-        rozmiar = simpledialog.askstring("Wymiary świata",
-                                         "Podaj wysokość i szerokość oddzielone przecinkiem (np. 10, 20):")
-        if rozmiar:
-            wysokosc, szerokosc = map(int, rozmiar.split(","))
-            return Punkt(wysokosc, szerokosc)
-        else:
-            return None
 
     def wcisniecieKlawisza(self, event):
         if self.swiat:
@@ -174,12 +179,79 @@ class WorldSimulatorApp(tk.Tk):
                 self.rysujSwiat()
                 self.strzalka = -1
 
+    def wyborOrganizmu(self, x_grid, y_grid):
+        okno_wyboru = Toplevel(self)
+        okno_wyboru.title("Wybierz organizm")
+        okno_wyboru.geometry("100x60")
+
+        symbol_map = {
+            'Czlowiek': 'C',
+            'Antylopa': 'A',
+            'Barszcz': 'b',
+            'Cyberowca': 'X',
+            'Guarana': 'g',
+            'Lis': 'L',
+            'Mlecz': 'm',
+            'Owca': 'O',
+            'Trawa': 't',
+            'Wilk': 'W',
+            'Żółw': 'Z',
+            'Jagody': 'w'
+        }
+
+        var = StringVar(okno_wyboru)
+        var.set('Antylopa')  # default value
+
+        option_menu = OptionMenu(okno_wyboru, var, *symbol_map.keys())
+        option_menu.pack()
+
+        def dodajOrganizm(symbol):
+            if symbol in symbol_map.values():
+                from Fabryka import utworzZwierze, utworzRosline
+
+                if symbol in ['A', 'W', 'Z', 'L', 'O', 'X']:
+                    organizm = utworzZwierze(symbol, y_grid, x_grid, self.swiat)
+                elif symbol in ['b', 'g', 'm', 't', 'w']:
+                    organizm = utworzRosline(symbol, y_grid, x_grid, self.swiat)
+                elif symbol in ['C']:
+                    organizm = self.swiat.getCzlowiek()
+                    if not organizm:
+                        organizm = utworzZwierze(symbol, y_grid, x_grid, self.swiat)
+                    else:
+                        messagebox.showinfo("Info", "Człowiek już istnieje")
+                        return
+                else:
+                    messagebox.showerror("Błąd", "Nieznany typ organizmu")
+                    return
+
+                if organizm:
+                    self.swiat.dodajOrganizm(organizm)
+                    okno_wyboru.destroy()
+                    self.rysujSwiat()
+            else:
+                messagebox.showerror("Błąd", "Nieznany typ organizmu")
+
+        button = Button(okno_wyboru, text="Dodaj", command=lambda: dodajOrganizm(symbol_map[var.get()]))
+        button.pack()
+
     def klikniecieMyszki(self, event):
         if self.swiat:
-            if ENTITY_SIZE * 2 < event.x < ENTITY_SIZE * 10 and SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 < event.y < SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2:
+            MARGIN = ENTITY_SIZE * 12
+            x_canvas = self.canvas.canvasx(event.x)
+            y_canvas = self.canvas.canvasy(event.y)
+            x_grid = (x_canvas - MARGIN) // ENTITY_SIZE
+            y_grid = (y_canvas - ENTITY_SIZE) // ENTITY_SIZE
+            if 0 <= x_grid < self.swiat.getSzerokosc() and 0 <= y_grid < self.swiat.getWysokosc():
+                if self.swiat.getOrganizm(y_grid, x_grid) is None:
+                    print(f"Kliknięcie na współrzędnych: ({x_grid}, {y_grid})")
+                    self.wyborOrganizmu(x_grid, y_grid)
+            if (ENTITY_SIZE * 2 < event.x < ENTITY_SIZE * 10 and
+                    SCREEN_HEIGHT / 2 - ENTITY_SIZE * 4 < event.y < SCREEN_HEIGHT / 2 - ENTITY_SIZE * 2):
                 self.zapiszSwiat(self.swiat)
-            elif ENTITY_SIZE * 2 < event.x < ENTITY_SIZE * 10 and SCREEN_HEIGHT / 2 < event.y < SCREEN_HEIGHT / 2 + ENTITY_SIZE * 2:
-                self.swiat = self.wczytajZapis()
+            elif (ENTITY_SIZE * 2 < event.x < ENTITY_SIZE * 10 and
+                  SCREEN_HEIGHT / 2 < event.y < SCREEN_HEIGHT / 2 + ENTITY_SIZE * 2):
+                self.wczytajZapis()
+                self.rysujSwiat()
 
 
 if __name__ == "__main__":
