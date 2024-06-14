@@ -33,7 +33,19 @@ class Antylopa(Zwierze):
             self.kolizja(organizm_na_nowym_pol)
 
     def kolizja(self, organizm):
-        if organizm.getSila() > self.getSila():
+        if organizm.getSymbol() == self.getSymbol():
+            if organizm.getCooldown() == 0 and self.getCooldown() == 0:
+                from Fabryka import utworzZwierze
+                nowy = utworzZwierze(self.getSymbol(), self.getX() + 1, self.getY(), self._swiat)
+                self._swiat.dodajOrganizm(nowy)
+                komunikat = ('rozmnozenie ' + organizm.nazwaOrganizmu(
+                    self.getSymbol()) + ' na pozycji (' +
+                             str(self.getX()) + ', ' + str(self.getY()) + ')')
+                self._swiat.dodajKomunikat(komunikat)
+                self.setCooldown(20)
+                organizm.setCooldown(20)
+                nowy.setCooldown(20)
+        elif organizm.getSila() > self.getSila():
             rand = random.Random()
             rng = rand.randint(0, 1)
             if rng == 1:

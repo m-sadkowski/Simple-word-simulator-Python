@@ -200,7 +200,7 @@ class WorldSimulatorApp(tk.Tk):
         }
 
         var = StringVar(okno_wyboru)
-        var.set('Antylopa')  # default value
+        var.set('Antylopa')
 
         option_menu = OptionMenu(okno_wyboru, var, *symbol_map.keys())
         option_menu.pack()

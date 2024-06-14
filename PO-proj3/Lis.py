@@ -31,8 +31,21 @@ class Lis(Zwierze):
             self._x = newX
             self._y = newY
         elif newX != self._x or newY != self._y:
-            if organizm_na_nowym_polu.getSila() > self.getSila():
+            if organizm_na_nowym_polu.getSymbol() == self.getSymbol():
+                if organizm_na_nowym_polu.getCooldown() == 0 and self.getCooldown() == 0:
+                    from Fabryka import utworzZwierze
+                    nowy = utworzZwierze(self.getSymbol(), self.getX() + 1, self.getY(), self._swiat)
+                    self._swiat.dodajOrganizm(nowy)
+                    komunikat = ('rozmnozenie ' + organizm_na_nowym_polu.nazwaOrganizmu(
+                        self.getSymbol()) + ' na pozycji (' +
+                                 str(self.getX()) + ', ' + str(self.getY()) + ')')
+                    self._swiat.dodajKomunikat(komunikat)
+                    self.setCooldown(20)
+                    organizm_na_nowym_polu.setCooldown(20)
+                    nowy.setCooldown(20)
+            elif organizm_na_nowym_polu.getSila() > self.getSila():
                 komunikat = ('Lis korzysta z dobrego wechu i omija ' +
                              organizm_na_nowym_polu.nazwaOrganizmu(organizm_na_nowym_polu.getSymbol()) +
                              ' na pozycji ' + str(organizm_na_nowym_polu.getX()) + ', ' + str(organizm_na_nowym_polu.getY()))
                 self._swiat.dodajKomunikat(komunikat)
+

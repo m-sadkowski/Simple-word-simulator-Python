@@ -16,7 +16,19 @@ class Zolw(Zwierze):
             super().akcja()
 
     def kolizja(self, organizm):
-        if organizm.getSila() < 5 and not isinstance(organizm, Roslina):
+        if organizm.getSymbol() == self.getSymbol():
+            if organizm.getCooldown() == 0 and self.getCooldown() == 0:
+                from Fabryka import utworzZwierze
+                nowy = utworzZwierze(self.getSymbol(), self.getX() + 1, self.getY(), self._swiat)
+                self._swiat.dodajOrganizm(nowy)
+                komunikat = ('rozmnozenie ' + organizm.nazwaOrganizmu(
+                    self.getSymbol()) + ' na pozycji (' +
+                             str(self.getX()) + ', ' + str(self.getY()) + ')')
+                self._swiat.dodajKomunikat(komunikat)
+                self.setCooldown(20)
+                organizm.setCooldown(20)
+                nowy.setCooldown(20)
+        elif organizm.getSila() < 5 and not isinstance(organizm, Roslina):
             komunikat = 'Zolw blokuje atak ' + organizm.nazwaOrganizmu(organizm.getSymbol()) + ' na pozycji ' + str(self.getX()) + ', ' + str(self.getY())
             self._swiat.dodajKomunikat(komunikat)
         else:

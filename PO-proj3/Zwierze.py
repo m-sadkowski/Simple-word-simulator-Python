@@ -53,14 +53,12 @@ class Zwierze(Organizm):
             self._swiat.dodajKomunikat(komunikat)
             self._swiat.przeniesOrganizm(self, organizm.getX(), organizm.getY())
             self._swiat.usunOrganizm(organizm)
-
         elif organizm.getSila() > self.getSila():
             komunikat = organizm.nazwaOrganizmu(organizm.getSymbol()) + ' zabija ' + organizm.nazwaOrganizmu(
                 self.getSymbol()) + ' na pozycji ' + str(organizm.getX()) + ', ' + str(organizm.getY())
             self._swiat.dodajKomunikat(komunikat)
             organizm._swiat.przeniesOrganizm(organizm, organizm.getX(), organizm.getY())
             self._swiat.usunOrganizm(self)
-
         elif organizm.getSila() <= self.getSila():
             komunikat = self.nazwaOrganizmu(self.getSymbol()) + ' zabija ' + organizm.nazwaOrganizmu(
                 organizm.getSymbol()) + ' na pozycji ' + str(self.getX()) + ', ' + str(self.getY())
