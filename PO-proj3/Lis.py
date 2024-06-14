@@ -48,4 +48,6 @@ class Lis(Zwierze):
                              organizm_na_nowym_polu.nazwaOrganizmu(organizm_na_nowym_polu.getSymbol()) +
                              ' na pozycji ' + str(organizm_na_nowym_polu.getX()) + ', ' + str(organizm_na_nowym_polu.getY()))
                 self._swiat.dodajKomunikat(komunikat)
+            else:
+                self.kolizja(organizm_na_nowym_polu)
 
