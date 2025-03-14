@@ -23,8 +23,8 @@ For the C++ implementation of this project, visit:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/m-sadkowski/Simple-word-simulator-Python-Pygame.git
-   cd Simple-word-simulator-Python-Pygame
+   git clone https://github.com/m-sadkowski/Simple-word-simulator-Python.git
+   cd Simple-word-simulator-Python
    ```
 
 2. Install all required dependencies.
